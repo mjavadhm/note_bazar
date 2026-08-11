@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>جزوه‌بازار — خرید و فروش جزوه دانشجویی</title>
+  <meta name="description" content="بازار جزوه‌های دانشجویی — پیدا کردن جزوه بر اساس دانشگاه، درس و استاد">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@500;600;700&family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="home">
+
+  <header class="masthead">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <span class="name">جزوه‌بازار</span>
+        <span class="tag">بازار جزوه‌های دانشجویی — از دانشجو، برای دانشجو</span>
+      </a>
+      <nav class="nav">
+        <a href="#catalog">فهرست</a>
+        <a href="#how">روش کار</a>
+        <a href="#sell">فروشنده شو</a>
+        <a class="btn" data-bot-link href="#">ورود با تلگرام</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="kicker">فهرست امروز — نسخه‌ی آنلاین</div>
+      <h1>جزوه‌ات رو پیدا کن.<br>جزوه‌هات رو بفروش.</h1>
+      <p class="sub">بر اساس دانشگاه، درس و استاد جستجو کن؛ پیش‌نمایش واترمارک‌دار ببین؛ نظر خریدارها رو بخون و امن بخر — همه‌چیز داخل تلگرام.</p>
+      <form class="searchbar" id="search-form">
+        <input type="search" id="search-input" placeholder="مثلاً: ریاضی ۱، دکتر احمدی، ساختمان داده…">
+        <button class="btn btn-primary" type="submit">جستجو</button>
+      </form>
+    </div>
+  </section>
+
+  <div class="stats-strip">
+    <div class="container" style="display:contents">
+      <div class="stat"><b id="stat-notes">—</b><span>جزوه در فهرست</span></div>
+      <div class="stat"><b id="stat-unis">—</b><span>دانشگاه</span></div>
+      <div class="stat"><b id="stat-buys">—</b><span>خرید موفق</span></div>
+    </div>
+  </div>
+
+  <section class="section" id="catalog">
+    <div class="container">
+      <div class="filters">
+        <label><span class="lbl">دانشگاه</span><select id="f-uni"><option value="">همه</option></select></label>
+        <label><span class="lbl">دانشکده</span><select id="f-fac"><option value="">همه</option></select></label>
+        <label><span class="lbl">درس</span><select id="f-course"><option value="">همه</option></select></label>
+        <label><span class="lbl">استاد</span><select id="f-prof"><option value="">همه</option></select></label>
+      </div>
+      <h2 class="section-title">فهرست جزوه‌ها <small id="notes-count"></small></h2>
+      <div class="catalog" id="notes-grid"></div>
+    </div>
+  </section>
+
+  <section class="section how" id="how">
+    <div class="container">
+      <h2 class="section-title">روش کار</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="num">۰۱</div>
+          <h3>پیداش کن</h3>
+          <p>توی فهرست بر اساس دانشگاه ← دانشکده ← درس ← استاد بگرد، یا مستقیم اسم درس یا استاد رو جستجو کن.</p>
+        </div>
+        <div class="step">
+          <div class="num">۰۲</div>
+          <h3>ارزیابی کن</h3>
+          <p>چند صفحه‌ی اول رو با واترمارک ببین، تعداد صفحه و ترم رو چک کن و نظر خریدارهای قبلی رو بخون.</p>
+        </div>
+        <div class="step">
+          <div class="num">۰۳</div>
+          <h3>امن بخر</h3>
+          <p>پرداخت با کیف پول داخل بات انجام می‌شه و فایل کامل بلافاصله میاد — یا آنلاین با واترمارک شخصی بخونش.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="sell">
+    <div class="container">
+      <div class="kicker">برای فروشنده‌ها</div>
+      <h2>جزوه‌هات برات درآمد بسازن.</h2>
+      <p>آپلود کن، قیمت بذار، تمام. پیش‌نمایش واترمارک‌دار، پرداخت امن و تسویه‌ی درآمد رو ما آماده کردیم.</p>
+      <a class="btn btn-lg" data-bot-link href="#">شروع فروش در بات</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <span>© ۱۴۰۵ جزوه‌بازار</span>
+      <a href="#how">روش کار</a>
+      <a data-bot-link href="#">بات تلگرام</a>
+      <span style="margin-inline-start:auto">ساخته‌شده برای دانشجوها</span>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="assets/app.js"></script>
+  <script src="assets/site.js"></script>
+</body>
+</html>

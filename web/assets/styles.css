@@ -1,0 +1,350 @@
+/* NoteBazar — Academic Editorial Design System
+   کاغذ کرم + جوهر تیره + تایپ نسخ + حاشیه‌های مویی. بدون کلیشه. */
+
+:root {
+  --paper: #faf8f3;
+  --surface: #f4f1e8;
+  --ink: #1d1b16;
+  --ink2: #6e6a5c;
+  --line: #e4e0d3;
+  --accent: #2e5b3e;
+  --accent-soft: #e4ede5;
+  --amber: #b4652a;
+  --red: #a8463a;
+  --radius: 6px;
+  --font-body: "Vazirmatn", "Segoe UI", Tahoma, system-ui, sans-serif;
+  --font-display: "Noto Naskh Arabic", "Vazirmatn", Tahoma, serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #161511;
+    --surface: #1e1c17;
+    --ink: #efede4;
+    --ink2: #a39e8e;
+    --line: #2e2b24;
+    --accent: #8fbf9b;
+    --accent-soft: #22352a;
+    --amber: #d9975b;
+    --red: #e08a7d;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--accent); color: var(--paper); }
+
+a { color: var(--accent); text-decoration: none; }
+
+.container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+/* ── مست‌هد ───────────────────────── */
+.masthead {
+  border-bottom: 3px double var(--ink);
+  background: var(--paper);
+  position: sticky; top: 0; z-index: 50;
+}
+.masthead .container {
+  display: flex; align-items: center; gap: 20px; height: 64px;
+}
+.brand {
+  display: flex; align-items: baseline; gap: 10px;
+  color: var(--ink);
+}
+.brand .name { font-family: var(--font-display); font-weight: 700; font-size: 26px; line-height: 1; }
+.brand .tag { color: var(--ink2); font-size: 12px; letter-spacing: 0.02em; }
+.nav { display: flex; gap: 20px; margin-inline-start: auto; align-items: center; }
+.nav a { color: var(--ink2); font-size: 14px; }
+.nav a:hover { color: var(--ink); }
+
+/* ── دکمه‌ها — صریح و مربعی ────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 46px; padding: 0 22px;
+  border-radius: var(--radius);
+  border: 1px solid var(--ink);
+  background: transparent; color: var(--ink);
+  font: inherit; font-size: 15px; font-weight: 500; cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.btn:hover { background: var(--ink); color: var(--paper); }
+.btn-primary { background: var(--ink); color: var(--paper); }
+.btn-primary:hover { background: var(--accent); border-color: var(--accent); }
+.btn-lg { min-height: 54px; padding: 0 30px; font-size: 16px; }
+.btn-block { width: 100%; }
+
+/* دکمه معکوس روی باند تیره */
+.band .btn { border-color: var(--paper); color: var(--paper); }
+.band .btn:hover { background: var(--paper); color: var(--ink); }
+
+/* ── هیرو — کاغذ دفترچه ────────────── */
+.hero {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(to left, transparent calc(100% - 56px), rgba(190, 70, 60, 0.22) calc(100% - 56px), rgba(190, 70, 60, 0.22) calc(100% - 55px), transparent calc(100% - 55px)),
+    repeating-linear-gradient(to bottom, transparent 0, transparent 35px, var(--line) 35px, var(--line) 36px);
+  border-bottom: 1px solid var(--ink);
+  padding: 72px 0 56px;
+}
+.kicker {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--ink2); font-size: 13px; letter-spacing: 0.08em;
+  margin-bottom: 20px;
+}
+.kicker::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+.hero h1 {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(38px, 6.5vw, 68px);
+  line-height: 1.25; margin: 0 0 16px;
+  letter-spacing: -0.01em;
+}
+.hero .sub { color: var(--ink2); font-size: 17px; margin: 0; max-width: 600px; }
+
+.searchbar {
+  display: flex; margin-top: 32px; max-width: 640px;
+  border: 1px solid var(--ink); background: var(--paper);
+}
+.searchbar input {
+  flex: 1; height: 54px; padding: 0 18px; font: inherit; font-size: 16px;
+  border: 0; background: transparent; color: var(--ink);
+}
+.searchbar input:focus { outline: none; }
+.searchbar:focus-within { box-shadow: 3px 3px 0 var(--ink); }
+.searchbar .btn { border: 0; border-inline-start: 1px solid var(--ink); border-radius: 0; min-height: 54px; }
+
+/* ── نوار آمار ─────────────────────── */
+.stats-strip {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid var(--ink);
+}
+.stat {
+  padding: 20px 24px; border-inline-end: 1px solid var(--line);
+}
+.stat:last-child { border-inline-end: 0; }
+.stat b {
+  display: block; font-family: var(--font-display); font-weight: 700;
+  font-size: 30px; line-height: 1.2; color: var(--accent);
+}
+.stat span { color: var(--ink2); font-size: 13px; }
+
+/* ── فیلترها — خط زیرینی مینیمال ───── */
+.filters {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+  padding: 24px 0; border-bottom: 1px solid var(--line);
+}
+.filters label { display: block; }
+.filters .lbl { display: block; font-size: 12px; color: var(--ink2); margin-bottom: 2px; }
+.filters select {
+  width: 100%; height: 40px; padding: 0;
+  font: inherit; font-size: 14.5px; font-weight: 500;
+  border: 0; border-bottom: 1px solid var(--ink2); border-radius: 0;
+  background: transparent; color: var(--ink);
+}
+.filters select:focus { outline: none; border-bottom-color: var(--accent); }
+
+/* ── کاتالوگ جزوه‌ها ────────────────── */
+.section { padding: 8px 0 48px; }
+.section-title {
+  font-family: var(--font-display); font-size: 26px; font-weight: 700;
+  margin: 24px 0 4px; display: flex; align-items: baseline; gap: 14px;
+}
+.section-title small { color: var(--ink2); font-size: 13px; font-weight: 400; font-family: var(--font-body); }
+
+.catalog { border-top: 1px solid var(--ink); }
+
+.nrow {
+  display: grid; grid-template-columns: 52px 1fr auto; gap: 20px;
+  padding: 22px 8px;
+  border-bottom: 1px solid var(--line);
+  transition: background 0.12s;
+  align-items: start;
+}
+.nrow:hover { background: var(--surface); }
+.nrow-idx {
+  font-family: var(--font-display); font-size: 20px; font-weight: 600;
+  color: var(--ink2); padding-top: 3px;
+}
+.nrow-main h3 {
+  margin: 0 0 6px; font-family: var(--font-display);
+  font-size: 21px; font-weight: 700; line-height: 1.45;
+}
+.nrow-main h3 a { color: var(--ink); }
+.nrow-main h3 a:hover { color: var(--accent); }
+.nrow-meta { color: var(--ink2); font-size: 13.5px; }
+.nrow-sub { color: var(--ink2); font-size: 13px; margin-top: 4px; }
+.nrow-sub .amber { color: var(--amber); }
+.nrow-tags { margin-top: 6px; font-size: 13px; color: var(--accent); }
+.nrow-tags span { margin-inline-end: 10px; }
+
+.nrow-side { text-align: left; padding-top: 4px; min-width: 130px; }
+.nrow-price {
+  font-family: var(--font-display); font-weight: 700; font-size: 22px; line-height: 1.1;
+  font-feature-settings: "tnum";
+}
+.nrow-price small { display: block; font-family: var(--font-body); font-weight: 400; font-size: 12px; color: var(--ink2); }
+.nrow-price.free { color: var(--accent); }
+.btn-mini {
+  display: inline-block; margin-top: 8px; font-size: 13px;
+  color: var(--ink); border-bottom: 1px solid var(--ink);
+  padding-bottom: 1px;
+}
+.btn-mini:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ── مراحل — تحریریه ────────────────── */
+.how { border-top: 1px solid var(--ink); }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; padding-top: 8px; }
+.step { border-top: 1px solid var(--ink); padding-top: 16px; }
+.step .num {
+  font-family: var(--font-display); font-weight: 700; font-size: 34px;
+  color: var(--accent); line-height: 1; margin-bottom: 10px;
+}
+.step h3 { margin: 0 0 6px; font-size: 17px; font-weight: 700; }
+.step p { margin: 0; color: var(--ink2); font-size: 14.5px; }
+
+/* ── باند فروشنده — معکوس ───────────── */
+.band {
+  background: var(--ink); color: var(--paper);
+  padding: 56px 0; margin-top: 24px;
+}
+.band h2 {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(26px, 4vw, 40px); margin: 0 0 10px; line-height: 1.35;
+}
+.band p { margin: 0 0 24px; opacity: 0.75; max-width: 520px; }
+.band .kicker { color: var(--paper); opacity: 0.6; }
+.band .kicker::after { border-color: rgba(255, 255, 255, 0.25); }
+
+/* ── صفحه جزوه ────────────────────── */
+.doc-head { padding: 36px 0 20px; border-bottom: 1px solid var(--ink); }
+.breadcrumb { color: var(--ink2); font-size: 13px; margin-bottom: 12px; }
+.doc-head h1 {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(26px, 4vw, 38px); line-height: 1.35; margin: 0 0 10px;
+}
+.doc-head .tags { color: var(--accent); font-size: 14px; margin-bottom: 8px; }
+.doc-head .tags span { margin-inline-end: 12px; }
+
+.detail {
+  display: grid; grid-template-columns: 340px 1fr; gap: 40px;
+  padding: 32px 0; align-items: start;
+}
+.info-panel { border-top: 3px solid var(--ink); padding-top: 16px; position: sticky; top: 88px; }
+.kv { display: flex; justify-content: space-between; gap: 16px; font-size: 14.5px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.kv span { color: var(--ink2); }
+.kv b { font-weight: 600; text-align: left; }
+.big-price {
+  font-family: var(--font-display); font-weight: 700; font-size: 34px;
+  padding: 18px 0; font-feature-settings: "tnum";
+}
+.big-price small { font-family: var(--font-body); font-size: 14px; font-weight: 400; color: var(--ink2); }
+.secure-note { font-size: 12.5px; color: var(--ink2); text-align: center; margin-top: 10px; }
+
+.stars { color: var(--amber); font-size: 14px; letter-spacing: 1px; }
+.stars .n { color: var(--ink2); letter-spacing: 0; }
+
+.block-title {
+  font-family: var(--font-display); font-size: 20px; font-weight: 700;
+  margin: 0 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--ink);
+}
+
+.doc-frame {
+  background: #fff; border: 1px solid var(--line);
+  padding: 10px; margin-bottom: 20px;
+  box-shadow: 4px 4px 0 var(--line);
+}
+.doc-frame img { width: 100%; display: block; }
+
+.review { border-inline-start: 2px solid var(--accent); padding: 4px 16px; margin-bottom: 18px; }
+.review p { margin: 4px 0; }
+.review .who { font-size: 12.5px; color: var(--ink2); }
+
+.desc-text { color: var(--ink2); max-width: 65ch; }
+
+/* ── مینی‌اپ ──────────────────────── */
+.vbar {
+  position: sticky; top: 0; z-index: 40;
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px;
+  background: var(--paper);
+  border-bottom: 3px double var(--ink);
+}
+.vbar .title {
+  font-family: var(--font-display); font-weight: 700; font-size: 16px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
+}
+.vbar .count { color: var(--ink2); font-size: 13px; white-space: nowrap; font-feature-settings: "tnum"; }
+.vbar a { color: var(--ink2); }
+
+.viewer { padding: 20px 12px 64px; max-width: 860px; margin: 0 auto; }
+.viewer .doc-frame { margin-bottom: 24px; }
+.viewer img {
+  width: 100%; display: block;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+.wm-note {
+  text-align: center; color: var(--ink2); font-size: 13px;
+  padding: 12px 16px 28px; border-top: 1px solid var(--line);
+}
+
+.lib-head {
+  font-family: var(--font-display); font-weight: 700; font-size: 26px;
+  padding: 20px 4px 4px; margin: 0;
+}
+.lib-sub { color: var(--ink2); font-size: 13px; padding: 0 4px 16px; border-bottom: 1px solid var(--ink); }
+
+.lib-item {
+  display: flex; align-items: center; gap: 16px;
+  padding: 18px 4px; border-bottom: 1px solid var(--line);
+}
+.lib-item .cover {
+  width: 52px; height: 64px; flex: none;
+  border: 1px solid var(--ink);
+  background: var(--paper); color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 24px; font-weight: 700;
+}
+.lib-item h3 { margin: 0 0 3px; font-family: var(--font-display); font-size: 17px; font-weight: 700; }
+.lib-item .meta { color: var(--ink2); font-size: 13px; }
+.lib-item .btn { margin-inline-start: auto; flex: none; min-height: 40px; padding: 0 16px; font-size: 14px; }
+
+/* ── حالت‌ها ──────────────────────── */
+.empty, .error-box {
+  text-align: center; padding: 56px 16px; color: var(--ink2);
+  border: 1px dashed var(--ink2); margin: 16px 0;
+}
+.error-box { color: var(--red); border-color: var(--red); }
+.center-msg { text-align: center; padding: 64px 24px; color: var(--ink2); }
+
+footer {
+  border-top: 3px double var(--ink); margin-top: 40px;
+  padding: 20px 0 44px; color: var(--ink2); font-size: 13px;
+}
+footer .container { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
+footer a { color: var(--ink2); border-bottom: 1px solid var(--line); }
+footer a:hover { color: var(--ink); border-color: var(--ink); }
+
+/* ── ریسپانسیو ────────────────────── */
+@media (max-width: 768px) {
+  .filters { grid-template-columns: repeat(2, 1fr); }
+  .steps { grid-template-columns: 1fr; gap: 20px; }
+  .detail { grid-template-columns: 1fr; }
+  .info-panel { position: static; }
+  .hero { padding: 44px 0 36px; }
+  .nav a:not(.btn) { display: none; }
+  .stats-strip { grid-template-columns: repeat(3, 1fr); }
+  .stat { padding: 14px 12px; }
+  .stat b { font-size: 22px; }
+  .nrow { grid-template-columns: 36px 1fr; }
+  .nrow-side { grid-column: 2; text-align: right; display: flex; align-items: center; gap: 16px; min-width: 0; }
+  .nrow-price { font-size: 19px; }
+}
