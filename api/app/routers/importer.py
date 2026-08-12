@@ -1,16 +1,22 @@
 """ایمپورت جزوه از کانال‌های کراول‌شده — فقط ادمین.
 
-دو مسیر:
+سه مسیر:
   POST /import/notes  — تک‌فایل multipart (آپلود مستقیم یا telegram_file_id)
-  POST /import/crawl  — دسته‌ای JSON دقیقاً با خروجی کراولر tgarchive:
-                        course_name, professor, term («4041»), university,
-                        doc_type, tags, media_type, body (پست متنی ← فایل txt)
+  POST /import/crawl  — دسته‌ای JSON دقیقاً با خروجی enricher کراولر
+  POST /import/csv    — فایل CSV خروجی `/export` کراولر (utf-8-sig)
+                        ستون‌ها: course_name, professor, term, university,
+                        doc_type, tags(JSON), media_type, body, status, ...
 درخت دانشگاه ← دانشکده ← درس ← استاد خودکار find-or-create و تأییدشده ساخته می‌شه.
 
 نکته مهم: telegram_file_id باید متعلق به همین بات (نوت‌بازار) باشه —
-file_id بات‌های دیگه (مثل بات کراولر) برای دانلود معتبر نیست.
+file_id بات‌های دیگه (مثل بات کراولر) برای دانلود معتبر نیست. برای همین توی
+ایمپورت CSV فقط ردیف‌های متنی (با body) فایل می‌گیرن؛ ردیف‌های رسانه‌ای
+بدون فایل گزارش می‌شن تا بعداً آپلودشون کنی.
 """
 
+import csv as csvlib
+import io
+import json
 import mimetypes
 from uuid import uuid4
 
@@ -150,16 +156,20 @@ class CrawlBatch(BaseModel):
     items: list[CrawlItem] = Field(max_length=100)
 
 
-def _import_crawl_item(db: Session, admin: User, item: CrawlItem) -> int:
-    kind = doc_type(item.doc_type)
-    title = item.title or " ".join(
+def _default_title(kind: str | None, item_course: str, professor: str | None, term: str | None) -> str:
+    return " ".join(
         part for part in [
             kind or "جزوه",
-            item.course_name,
-            f"— {item.professor}" if item.professor else None,
-            f"({term_display(item.term)})" if term_display(item.term) else None,
+            item_course,
+            f"— {professor}" if professor else None,
+            f"({term_display(term)})" if term_display(term) else None,
         ] if part
     )
+
+
+def _import_crawl_item(db: Session, admin: User, item: CrawlItem) -> int:
+    kind = doc_type(item.doc_type)
+    title = item.title or _default_title(kind, item.course_name, item.professor, item.term)
 
     # فایل: دانلود از تلگرام، یا ساخت txt از پست متنی
     if item.telegram_file_id:
@@ -215,3 +225,85 @@ def import_crawl(
             db.rollback()
             results.append({"index": i, "ok": False, "error": "internal error"})
     return {"imported": imported, "failed": len(batch.items) - imported, "results": results}
+
+
+# ── ایمپورت از CSV خروجی کراولر (/export) ────────────────────────
+
+
+def _parse_tags_cell(raw: str) -> list[str]:
+    """ستون tags توی CSV به صورت JSON array ذخیره شده — با فالبک کاما."""
+    raw = (raw or "").strip()
+    if not raw:
+        return []
+    try:
+        parsed = json.loads(raw)
+        if isinstance(parsed, list):
+            return [str(t).strip() for t in parsed if str(t).strip()]
+    except (json.JSONDecodeError, ValueError):
+        pass
+    return [t.strip() for t in raw.replace("،", ",").split(",") if t.strip()]
+
+
+@router.post("/csv", status_code=201)
+def import_csv(
+    file: UploadFile = File(...),
+    default_price: int = Form(0),
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_admin),
+):
+    """فایل CSV خروجی کراولر رو می‌گیره: `python -m tools.manage export out.csv`
+
+    - فقط ردیف‌های status='ready' وارد می‌شن
+    - ردیف‌های متنی (media_type='text' با body) کامل وارد می‌شن (به txt)
+    - ردیف‌های رسانه‌ای (pdf/photo/document) فایل ندارن → گزارش می‌شن
+    - default_price روی همه ردیف‌ها اعمال می‌شه (CSV قیمت نداره)
+    """
+    raw = file.file.read()
+    try:
+        text = raw.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        raise HTTPException(400, "فایل باید UTF-8 باشه (خروجی export کراولر همینه)")
+
+    reader = csvlib.DictReader(io.StringIO(text))
+    results = []
+    imported = failed = skipped = 0
+    for i, row in enumerate(reader):
+        status = (row.get("status") or "").strip()
+        if status != "ready":
+            skipped += 1
+            results.append({"index": i, "ok": False, "error": f"رد شد — status={status or 'خالی'}"})
+            continue
+        university = (row.get("university") or "").strip()
+        course_name = (row.get("course_name") or "").strip()
+        if not university or not course_name:
+            failed += 1
+            results.append({"index": i, "ok": False, "error": "university یا course_name خالیه"})
+            continue
+
+        item = CrawlItem(
+            university=university,
+            course_name=course_name,
+            professor=(row.get("professor") or "").strip() or None,
+            term=(row.get("term") or "").strip() or None,
+            doc_type=(row.get("doc_type") or "").strip() or None,
+            tags=_parse_tags_cell(row.get("tags") or "")[:10],
+            price_toman=default_price,
+            media_type=(row.get("media_type") or "pdf").strip(),
+            file_name=(row.get("file_name") or "file").strip(),
+            body=(row.get("body") or "").strip() or None,
+        )
+        try:
+            note_id = _import_crawl_item(db, admin, item)
+            db.commit()
+            results.append({"index": i, "ok": True, "note_id": note_id})
+            imported += 1
+        except HTTPException as e:
+            db.rollback()
+            failed += 1
+            results.append({"index": i, "ok": False, "error": str(e.detail)})
+        except Exception:
+            db.rollback()
+            failed += 1
+            results.append({"index": i, "ok": False, "error": "internal error"})
+
+    return {"imported": imported, "failed": failed, "skipped": skipped, "results": results}

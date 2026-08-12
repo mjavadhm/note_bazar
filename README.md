@@ -2,7 +2,8 @@
 
 بات تلگرام + سایت + مینی‌اپ برای خرید و فروش جزوه دانشجویی — با کیف پول داخلی،
 **اکانت مستقل از تلگرام (ایمیل/رمز)**، پیش‌نمایش واترمارک‌دار، خواننده آنلاین با
-واترمارک شخصی، و **ایمپورت مستقیم خروجی کراولر tgarchive** (نوع مدرک، ترم، تگ).
+واترمارک شخصی، و **ایمپورت مستقیم خروجی کراولر tgarchive** (JSON دسته‌ای، CSV اکسپورت،
+یا تک‌فایل) با نوع مدرک، ترم و تگ.
 
 ## معماری
 
@@ -48,16 +49,8 @@ docker compose logs -f bot
 
 - **بات:** ثبت‌نام خودکار با `/start` (تلگرام یک provider هست، نه تنها راه)
 - **سایت:** صفحه `account.html` ← ثبت‌نام/ورود با ایمیل و رمز ← توکن Bearer
-  (stateless، امضاشده با API_SECRET، یک‌ماهه) — کیف پول و خریدها اونجا هم هستن
+  (stateless، امضاشده با API_SECRET، یک‌ماهه)
 - همه اندپوینت‌های کاربری هر دو مسیر احراز رو قبول می‌کنن
-
-```bash
-# نمونه: ثبت‌نام و گرفتن موجودی با توکن
-curl -X POST http://localhost:8311/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"a@b.com","password":"secret1","name":"علی"}'
-curl http://localhost:8311/auth/me -H "Authorization: Bearer <TOKEN>"
-```
 
 ## 📚 فیلدهای جزوه (هم‌راستا با کراولر tgarchive)
 
@@ -65,55 +58,73 @@ curl http://localhost:8311/auth/me -H "Authorization: Bearer <TOKEN>"
 |---|---|---|
 | `kind` | «نمونه سوال پایانترم» | واژگان کنترل‌شده — دقیقاً مثل `doc_type` کراولر |
 | `term` | «4041» | خام — مثل خروجی کراولر |
-| `term_display` | «بهار ۱۴۰۴» | مشتق خودکار برای نمایش (۴۰۴۱ ← سال ۱۴۰۴، نیمسال ۱=بهار) |
+| `term_display` | «بهار ۱۴۰۴» | مشتق خودکار (۴۰۴۱ ← سال ۱۴۰۴، نیمسال ۱=بهار) |
 | `tags` | ["جمع‌بندی", "حل تمرین"] | حداکثر ۱۰ |
 
-فیلترها: `GET /notes?kind=...&term=4041&tag=...` و `GET /public/notes?...`
-(جستجوی متنی روی عنوان، توضیح، نوع مدرک و تگ‌ها هم کار می‌کنه).
+فیلترها: `?kind=` / `?term=` / `?tag=` + جستجوی متنی روی عنوان، توضیح، نوع و تگ‌ها.
 
 ## 🕷️ ایمپورت از کراولر
 
-### دسته‌ای — دقیقاً با خروجی enricher
+### الف) CSV خروجی `/export` کراولر — ساده‌ترین راه
+
+توی کراولر (باتش یا ترمینال) خروجی بگیر:
+
+```bash
+# توی بات tgarchive (ادمین):  /export
+# یا ترمینال:
+python -m tools.manage export out.csv
+```
+
+بعد آپلودش کن:
+
+```bash
+curl -X POST http://localhost:8311/import/csv \
+  -H "X-Bot-Secret: $API_SECRET" -H "X-Telegram-Id: $ADMIN_TG_ID" \
+  -F "default_price=30000" \
+  -F "file=@out.csv"
+```
+
+- فقط ردیف‌های `status=ready` وارد می‌شن
+- ردیف‌های **متنی** (`media_type=text` با body) کامل وارد می‌شن → فایل `.txt`
+- ردیف‌های **رسانه‌ای** (pdf/photo/document) فایل ندارن (file_id مال بات کراولره)
+  → توی خروجی با خطای مشخص گزارش می‌شن تا با راه (ج) آپلودشون کنی
+- CSV قیمت نداره → `default_price` روی همه اعمال می‌شه
+- ستون `tags` توی CSV به صورت JSON array هست — خودکار پارس می‌شه
+
+جواب: `{"imported": n, "failed": m, "skipped": k, "results": [...]}`
+
+### ب) دسته‌ای JSON — `POST /import/crawl`
+
+دقیقاً با خروجی enricher (تا ۱۰۰ آیتم در درخواست):
 
 ```bash
 curl -X POST http://localhost:8311/import/crawl \
   -H "X-Bot-Secret: $API_SECRET" -H "X-Telegram-Id: $ADMIN_TG_ID" \
   -H "Content-Type: application/json" \
-  -d '{"items": [{
-    "university": "دانشگاه صنعتی شریف",
-    "course_name": "ریاضی 1",
-    "professor": "احمدی",
-    "term": "4041",
-    "doc_type": "نمونه سوال پایانترم",
-    "tags": ["نمونه سوال", "پاسخ تشریحی"],
-    "price_toman": 30000,
-    "media_type": "pdf",
-    "telegram_file_id": "BQAC..."
-  }]}'
+  -d '{"items": [{"university":"دانشگاه صنعتی شریف","course_name":"ریاضی 1",
+    "professor":"احمدی","term":"4041","doc_type":"نمونه سوال پایانترم",
+    "tags":["نمونه سوال"],"price_toman":30000,"media_type":"text","body":"..."}]}'
 ```
 
-- درخت دانشگاه ← درس ← استاد خودکار find-or-create و تأیید می‌شه (دانشکده پیش‌فرض: «سایر»)
-- استاد خالی ← «نامشخص» · عنوان خالی ← خودکار از نوع+درس+استاد+ترم ساخته می‌شه
-- **پست‌های متنی** (`media_type: "text"` + `body`) به فایل `.txt` تبدیل و آپلود می‌شن
-- هر آیتم جداگانه جواب می‌گیره — خطای یکی، بقیه رو نمی‌خرابه: `{imported, failed, results[]}`
-- ⚠️ `telegram_file_id` باید متعلق به بات نوت‌بازار باشه — file_id بات کراولر برای دانلود معتبر نیست؛
-  راه‌حل: فایل رو مستقیم با `POST /import/notes` (multipart) آپلود کن یا به بات فوروارد کن
-
-### تک‌فایل (multipart)
+### ج) تک‌فایل multipart — `POST /import/notes`
 
 ```bash
 curl -X POST http://localhost:8311/import/notes \
   -H "X-Bot-Secret: $API_SECRET" -H "X-Telegram-Id: $ADMIN_TG_ID" \
-  -F "university=دانشگاه صنعتی شریف" -F "course=ریاضی ۱" -F "professor=دکتر احمدی" \
+  -F "university=دانشگاه صنعتی شریف" -F "course=ریاضی ۱" -F "professor=احمدی" \
   -F "title=ریاضی ۱ — نمونه سوال" -F "kind=نمونه سوال پایانترم" -F "term=4041" \
-  -F "tags=نمونه سوال, جمع‌بندی" -F "price_toman=30000" -F "file=@notes.pdf"
+  -F "tags=نمونه سوال" -F "price_toman=30000" -F "file=@notes.pdf"
 ```
+
+- درخت دانشگاه ← درس ← استاد خودکار find-or-create و تأیید می‌شه (دانشکده: «سایر»)
+- استاد خالی ← «نامشخص» · عنوان خالی ← خودکار از نوع+درس+استاد+ترم
+- ⚠️ `telegram_file_id` باید متعلق به بات نوت‌بازار باشه (file_id بات کراولر معتبر نیست)
 
 ## تست فلو
 
 ۱. `/start` توی بات ← ثبت‌نام خودکار
 ۲. «💰 کیف پول» ← «شارژ تستی» (ادمین)
-۳. «➕ فروش جزوه» ← فایل ← عنوان ← توضیح ← قیمت ← ترم ← تگ‌ها ← **نوع مدرک** ← درخت
+۳. «➕ فروش جزوه» ← فایل ← عنوان ← توضیح ← قیمت ← ترم ← تگ‌ها ← نوع مدرک ← درخت
 ۴. `/panel` ← تأیید جزوه و پیشنهادها
 ۵. «🔍 جستجو» ← «👁 پیش‌نمایش» ← «🛒 خرید» ← فایل + امتیاز
 
@@ -130,7 +141,7 @@ curl -X POST http://localhost:8311/import/notes \
 
 - [ ] Alembic برای migration
 - [ ] درگاه پرداخت (زرین‌پال) + تسویه فروشنده
-- [ ] خرید مستقیم از سایت با اکانت ایمیلی (الان فقط مشاهده حسابه)
+- [ ] خرید مستقیم از سایت با اکانت ایمیلی
 - [ ] اتصال اکانت تلگرام به ایمیل (ادغام کیف پول‌ها)
 - [ ] `delivery_mode` روی جزوه (فقط آنلاین / دانلود واترمارک‌دار / آزاد)
 - [ ] escrow با Celery beat + گزارش تخلف + refund
