@@ -33,7 +33,7 @@ services:
     volumes:
       - miniodata:/data
     ports:
-      - "9001:9001"
+      - "8312:9001"   # 🗄️ کنسول MinIO
 
   api:
     build: ./api
@@ -47,7 +47,7 @@ services:
       minio:
         condition: service_started
     ports:
-      - "8000:8000"
+      - "8311:8000"   # ⚙️ API بک‌اند
 
   worker:
     build:
@@ -80,7 +80,7 @@ services:
     depends_on:
       - api
     ports:
-      - "8080:80"
+      - "8310:80"     # 🌐 سایت + مینی‌اپ
 
 volumes:
   pgdata:

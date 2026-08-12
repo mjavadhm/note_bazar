@@ -101,6 +101,8 @@ async function initNote() {
     const n = await api(`/public/notes/${id}`);
     document.title = n.title + " — جزوه‌بازار";
 
+    const termText = n.term_display || n.term;
+
     root.innerHTML = `
       <div class="doc-head">
         <div class="breadcrumb">${esc(n.university)} ← ${esc(n.faculty)} ← ${esc(n.course)}</div>
@@ -110,9 +112,10 @@ async function initNote() {
       </div>
       <div class="detail">
         <aside class="info-panel">
+          ${n.kind ? `<div class="kv"><span>نوع مدرک</span><b>${esc(n.kind)}</b></div>` : ""}
           <div class="kv"><span>استاد</span><b>${esc(n.professor)}</b></div>
           <div class="kv"><span>حجم</span><b>${n.page_count ? faNum(n.page_count) + " صفحه" : esc(n.file_name)}</b></div>
-          ${n.term ? `<div class="kv"><span>ترم</span><b>${esc(n.term)}</b></div>` : ""}
+          ${termText ? `<div class="kv"><span>ترم</span><b>${esc(termText)}</b></div>` : ""}
           <div class="kv"><span>فروشنده</span><b>${esc(n.seller_name)}</b></div>
           <div class="big-price">${n.price_toman === 0 ? "رایگان" : faNum(n.price_toman) + " <small>تومان</small>"}</div>
           <a class="btn btn-primary btn-lg btn-block" href="${botLink("note_" + n.id)}" target="_blank" rel="noopener">

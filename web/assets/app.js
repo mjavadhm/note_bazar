@@ -25,9 +25,10 @@ function tagsLine(tags) {
 function noteCardHtml(n, idx) {
   const no = String(idx ?? "").padStart(2, "0");
   const sub = [
+    n.kind ? esc(n.kind) : null,
     n.rating_count ? `<span class="amber">★ ${n.rating_avg} (${faNum(n.rating_count)})</span>` : null,
     n.page_count ? `${faNum(n.page_count)} صفحه` : null,
-    n.term ? esc(n.term) : null,
+    n.term_display || n.term ? esc(n.term_display || n.term) : null,
     n.has_preview ? "پیش‌نمایش دارد" : null,
   ].filter(Boolean).join(" · ");
   return `
@@ -83,12 +84,12 @@ const DEMO_DB = {
     { id: 3, name: "دکتر کریمی", university_id: 2 },
   ],
   notes: [
-    { id: 1, title: "ساختمان داده — جمع‌بندی کامل با تمرین حل‌شده", description: "خلاصه‌ی دست‌نویس همه فصل‌ها به‌همراه تمرین‌های امتحانی سه ترم اخیر.", price_toman: 45000, page_count: 68, term: "بهار ۱۴۰۴", tags: ["جمع‌بندی", "حل تمرین"], rating_avg: 4.6, rating_count: 23, has_preview: true, university: "دانشگاه صنعتی شریف", faculty: "مهندسی کامپیوتر", course: "ساختمان داده", professor: "دکتر احمدی", seller_name: "سارا", file_name: "data-structures.pdf" },
-    { id: 2, title: "ریاضی ۱ — فصل ۱ تا ۴ (حد، مشتق، پیوستگی)", description: "جزوه تایپ‌شده با مثال‌های تشریحی و نکات امتحانی.", price_toman: 30000, page_count: 42, term: "پاییز ۱۴۰۳", tags: ["تایپ‌شده", "نکات امتحانی"], rating_avg: 4.2, rating_count: 11, has_preview: true, university: "دانشگاه صنعتی شریف", faculty: "ریاضی", course: "ریاضی ۱", professor: "دکتر رضایی", seller_name: "علی", file_name: "math1.pdf" },
-    { id: 3, title: "مدار منطقی — اسلایدهای حاشیه‌نویسی‌شده", description: "اسلایدهای استاد با توضیحات کلاس، خط‌به‌خط.", price_toman: 25000, page_count: 120, term: "بهار ۱۴۰۴", tags: ["اسلاید", "کلاس"], rating_avg: 4.8, rating_count: 31, has_preview: true, university: "دانشگاه تهران", faculty: "مهندسی برق", course: "مدار منطقی", professor: "دکتر کریمی", seller_name: "مریم", file_name: "logic.pdf" },
-    { id: 4, title: "ساختمان داده — کدهای آماده پایتون", description: "پیاده‌سازی همه ساختمان‌داده‌ها با تست.", price_toman: 0, page_count: 25, term: "پاییز ۱۴۰۴", tags: ["کد", "پایتون"], rating_avg: 4.0, rating_count: 8, has_preview: false, university: "دانشگاه صنعتی شریف", faculty: "مهندسی کامپیوتر", course: "ساختمان داده", professor: "دکتر احمدی", seller_name: "رضا", file_name: "ds-code.pdf" },
-    { id: 5, title: "ریاضی ۱ — نمونه سوال ۱۰ ترم اخیر با پاسخ", description: "آرشیو کامل نمونه سوالات با پاسخ تشریحی.", price_toman: 55000, page_count: 95, term: "بهار ۱۴۰۴", tags: ["نمونه سوال", "پاسخ تشریحی"], rating_avg: 4.9, rating_count: 47, has_preview: true, university: "دانشگاه صنعتی شریف", faculty: "ریاضی", course: "ریاضی ۱", professor: "دکتر رضایی", seller_name: "نگار", file_name: "math1-exams.pdf" },
-    { id: 6, title: "مدار منطقی — جمع‌بندی شبکه‌های ترکیبی و ترتیبی", description: "فقط نکته و فرمول — مخصوص شب امتحان.", price_toman: 20000, page_count: 18, term: "پاییز ۱۴۰۴", tags: ["جمع‌بندی", "شب امتحان"], rating_avg: 3.9, rating_count: 6, has_preview: true, university: "دانشگاه تهران", faculty: "مهندسی برق", course: "مدار منطقی", professor: "دکتر کریمی", seller_name: "حسین", file_name: "logic-summary.pdf" },
+    { id: 1, title: "ساختمان داده — جمع‌بندی کامل با تمرین حل‌شده", description: "خلاصه‌ی دست‌نویس همه فصل‌ها به‌همراه تمرین‌های امتحانی سه ترم اخیر.", price_toman: 45000, page_count: 68, kind: "جزوه", term: "4041", term_display: "بهار ۱۴۰۴", tags: ["جمع‌بندی", "حل تمرین"], rating_avg: 4.6, rating_count: 23, has_preview: true, university: "دانشگاه صنعتی شریف", faculty: "مهندسی کامپیوتر", course: "ساختمان داده", professor: "دکتر احمدی", seller_name: "سارا", file_name: "data-structures.pdf" },
+    { id: 2, title: "ریاضی ۱ — فصل ۱ تا ۴ (حد، مشتق، پیوستگی)", description: "جزوه تایپ‌شده با مثال‌های تشریحی و نکات امتحانی.", price_toman: 30000, page_count: 42, kind: "جزوه", term: "4032", term_display: "پاییز ۱۴۰۳", tags: ["تایپ‌شده", "نکات امتحانی"], rating_avg: 4.2, rating_count: 11, has_preview: true, university: "دانشگاه صنعتی شریف", faculty: "ریاضی", course: "ریاضی ۱", professor: "دکتر رضایی", seller_name: "علی", file_name: "math1.pdf" },
+    { id: 3, title: "مدار منطقی — اسلایدهای حاشیه‌نویسی‌شده", description: "اسلایدهای استاد با توضیحات کلاس، خط‌به‌خط.", price_toman: 25000, page_count: 120, kind: "اسلاید", term: "4041", term_display: "بهار ۱۴۰۴", tags: ["اسلاید", "کلاس"], rating_avg: 4.8, rating_count: 31, has_preview: true, university: "دانشگاه تهران", faculty: "مهندسی برق", course: "مدار منطقی", professor: "دکتر کریمی", seller_name: "مریم", file_name: "logic.pdf" },
+    { id: 4, title: "ساختمان داده — کدهای آماده پایتون", description: "پیاده‌سازی همه ساختمان‌داده‌ها با تست.", price_toman: 0, page_count: 25, kind: "پروژه", term: "4042", term_display: "پاییز ۱۴۰۴", tags: ["کد", "پایتون"], rating_avg: 4.0, rating_count: 8, has_preview: false, university: "دانشگاه صنعتی شریف", faculty: "مهندسی کامپیوتر", course: "ساختمان داده", professor: "دکتر احمدی", seller_name: "رضا", file_name: "ds-code.pdf" },
+    { id: 5, title: "ریاضی ۱ — نمونه سوال ۱۰ ترم اخیر با پاسخ", description: "آرشیو کامل نمونه سوالات با پاسخ تشریحی.", price_toman: 55000, page_count: 95, kind: "نمونه سوال پایانترم", term: "4041", term_display: "بهار ۱۴۰۴", tags: ["نمونه سوال", "پاسخ تشریحی"], rating_avg: 4.9, rating_count: 47, has_preview: true, university: "دانشگاه صنعتی شریف", faculty: "ریاضی", course: "ریاضی ۱", professor: "دکتر رضایی", seller_name: "نگار", file_name: "math1-exams.pdf" },
+    { id: 6, title: "مدار منطقی — جمع‌بندی شبکه‌های ترکیبی و ترتیبی", description: "فقط نکته و فرمول — مخصوص شب امتحان.", price_toman: 20000, page_count: 18, kind: "خلاصه", term: "4042", term_display: "پاییز ۱۴۰۴", tags: ["جمع‌بندی", "شب امتحان"], rating_avg: 3.9, rating_count: 6, has_preview: true, university: "دانشگاه تهران", faculty: "مهندسی برق", course: "مدار منطقی", professor: "دکتر کریمی", seller_name: "حسین", file_name: "logic-summary.pdf" },
   ],
   reviews: [
     { rating: 5, comment: "دقیقاً همون چیزی بود که لازم داشتم، تمرین‌ها عالی بودن 👌", buyer: "امیر" },
@@ -129,7 +130,7 @@ function demoRoute(path) {
     let items = DEMO_DB.notes;
     if (q)
       items = items.filter((n) =>
-        (n.title + n.course + n.professor + (n.tags || []).join(" ")).includes(q)
+        (n.title + n.course + n.professor + (n.kind || "") + (n.tags || []).join(" ")).includes(q)
       );
     if (params.get("university_id"))
       items = items.filter((n) => n.university === DEMO_DB.universities.find((u) => u.id == params.get("university_id"))?.name);
@@ -137,6 +138,8 @@ function demoRoute(path) {
       items = items.filter((n) => (n.tags || []).includes(params.get("tag")));
     if (params.get("term"))
       items = items.filter((n) => n.term === params.get("term"));
+    if (params.get("kind"))
+      items = items.filter((n) => n.kind === params.get("kind"));
     return { total: items.length, items };
   }
   let m = p.match(/^\/public\/notes\/(\d+)$/);

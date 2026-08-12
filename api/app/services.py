@@ -2,6 +2,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from .models import LedgerEntry, Note, Review
+from .normalize import term_display
 
 
 def wallet_balance(db: Session, user_id: int) -> int:
@@ -24,7 +25,9 @@ def note_card(db: Session, note: Note) -> dict:
         "title": note.title,
         "description": note.description,
         "price_toman": note.price_toman,
+        "kind": note.kind,
         "term": note.term,
+        "term_display": term_display(note.term),
         "tags": note.tags or [],
         "page_count": note.page_count,
         "file_name": note.file_name,

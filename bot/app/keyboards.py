@@ -12,6 +12,13 @@ MAIN_KB = ReplyKeyboardMarkup(
     resize_keyboard=True,
 )
 
+# واژگان کنترل‌شده نوع مدرک — هم‌راستا با خروجی کراولر
+DOC_TYPES = [
+    "جزوه", "اسلاید", "خلاصه",
+    "نمونه سوال میانترم", "نمونه سوال پایانترم", "نمونه سوال",
+    "حل تمرین", "تمرین", "پروژه", "کتاب", "برنامه امتحانی", "اطلاعیه", "سایر",
+]
+
 
 def _viewer_url(note_id: int) -> str:
     return f"{settings.miniapp_url.rstrip('/')}/viewer.html?note={note_id}"
@@ -24,6 +31,18 @@ def items_kb(items: list[dict], prefix: str, add_new: str | None = None) -> Inli
         rows.append([InlineKeyboardButton(text=label, callback_data=f"{prefix}:{it['id']}")])
     if add_new:
         rows.append([InlineKeyboardButton(text="➕ پیشنهاد مورد جدید", callback_data=add_new)])
+    return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+def kind_kb() -> InlineKeyboardMarkup:
+    """انتخاب نوع مدرک — دوتا در هر ردیف + دکمه رد کردن."""
+    rows = []
+    for i in range(0, len(DOC_TYPES), 2):
+        rows.append([
+            InlineKeyboardButton(text=t, callback_data=f"sk:{t}")
+            for t in DOC_TYPES[i:i + 2]
+        ])
+    rows.append([InlineKeyboardButton(text="رد کردن ⤵️", callback_data="sk:-")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 

@@ -12,6 +12,7 @@ class SellSG(StatesGroup):
     price = State()
     term = State()       # سال/ترم تحصیلی (اختیاری)
     tags = State()       # تگ‌ها با کاما (اختیاری)
+    kind = State()       # نوع مدرک — انتخاب با دکمه (اختیاری)
     pick = State()       # انتخاب درخت با دکمه‌های اینلاین
     new_name = State()   # نام مورد جدیدی که کاربر پیشنهاد میده
 

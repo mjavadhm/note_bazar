@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
 from ..api import ApiError, api
-from ..keyboards import MAIN_KB, items_kb
+from ..keyboards import MAIN_KB, items_kb, kind_kb
 from ..states import SellSG
 
 router = Router()
@@ -100,7 +100,7 @@ async def sell_price(message: Message, state: FSMContext):
         return
     await state.update_data(price_toman=amount)
     await state.set_state(SellSG.term)
-    await message.answer("📅 سال یا ترم تحصیلی؟ مثلاً «بهار ۱۴۰۴»\nبرای رد کردن «-» بفرست.")
+    await message.answer("📅 سال یا ترم تحصیلی؟ مثلاً «4041» یا «بهار ۱۴۰۴»\nبرای رد کردن «-» بفرست.")
 
 
 @router.message(SellSG.term)
@@ -119,8 +119,17 @@ async def sell_tags(message: Message, state: FSMContext):
     text = message.text.strip()
     tags = [] if text == "-" else parse_tags(text)
     await state.update_data(tags=tags)
+    await state.set_state(SellSG.kind)
+    await message.answer("📚 نوع مدرک چیه؟", reply_markup=kind_kb())
+
+
+@router.callback_query(SellSG.kind, F.data.startswith("sk:"))
+async def sell_kind(cb: CallbackQuery, state: FSMContext):
+    value = cb.data.split(":", 1)[1]
+    await state.update_data(kind=None if value == "-" else value)
+    await cb.answer()
     await state.set_state(SellSG.pick)
-    await show_level(message, state, "university")
+    await show_level(cb.message, state, "university")
 
 
 @router.callback_query(SellSG.pick, F.data.startswith(("su:", "sf:", "sc:", "sp:")))
@@ -144,6 +153,7 @@ async def sell_pick(cb: CallbackQuery, state: FSMContext):
             "title": data["title"],
             "description": data.get("description", ""),
             "price_toman": data["price_toman"],
+            "kind": data.get("kind"),
             "term": data.get("term") or None,
             "tags": data.get("tags") or [],
             "course_id": data["course_id"],

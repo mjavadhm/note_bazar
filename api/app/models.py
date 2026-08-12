@@ -36,10 +36,17 @@ class LedgerKind(str, enum.Enum):
 
 
 class User(Base):
+    """کاربر — مستقل از تلگرام.
+
+    سه راه احراز: telegram_id (بات)، email+password (سایت)، یا هر دو روی یک اکانت.
+    """
+
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True)
+    telegram_id: Mapped[int | None] = mapped_column(BigInteger, unique=True, index=True)
+    email: Mapped[str | None] = mapped_column(String(200), unique=True, index=True)
+    password_hash: Mapped[str | None] = mapped_column(String(200))
     username: Mapped[str | None] = mapped_column(String(64))
     first_name: Mapped[str | None] = mapped_column(String(128))
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -95,8 +102,9 @@ class Note(Base):
     title: Mapped[str] = mapped_column(String(300))
     description: Mapped[str] = mapped_column(Text, default="")
     price_toman: Mapped[int] = mapped_column(Integer)
-    term: Mapped[str | None] = mapped_column(String(32))  # سال/ترم — مثل «بهار ۱۴۰۴»
-    tags: Mapped[list] = mapped_column(JSONB, default=list)  # ["جمع‌بندی", "نمونه سوال"]
+    kind: Mapped[str | None] = mapped_column(String(40), index=True)  # نوع مدرک: جزوه، نمونه سوال پایانترم، ...
+    term: Mapped[str | None] = mapped_column(String(32))  # ترم خام — مثل «4041» یا «1403»
+    tags: Mapped[list] = mapped_column(JSONB, default=list)
     file_key: Mapped[str] = mapped_column(String(500))
     file_name: Mapped[str] = mapped_column(String(300))
     file_size: Mapped[int] = mapped_column(BigInteger, default=0)

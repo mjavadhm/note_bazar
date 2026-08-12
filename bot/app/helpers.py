@@ -13,6 +13,7 @@ def card_text(c: dict) -> str:
     )
     pages = f"{c['page_count']} صفحه" if c.get("page_count") else escape(c["file_name"])
     tags = " ".join(f"#{escape(str(t))}" for t in (c.get("tags") or []))
+    term = c.get("term_display") or c.get("term")
 
     lines = [
         f"📄 <b>{escape(c['title'])}</b>",
@@ -20,8 +21,10 @@ def card_text(c: dict) -> str:
         f"👨‍🏫 {escape(c['professor'])}",
         f"📃 {pages} | {stars}",
     ]
-    if c.get("term"):
-        lines.append(f"📅 {escape(c['term'])}")
+    if c.get("kind"):
+        lines.append(f"📚 نوع: {escape(c['kind'])}")
+    if term:
+        lines.append(f"📅 {escape(term)}")
     if tags:
         lines.append(f"🏷️ {tags}")
     lines.append(f"💰 {fa_money(c['price_toman'])}")

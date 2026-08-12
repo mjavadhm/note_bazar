@@ -39,7 +39,7 @@ class Api:
 
     async def register(self, tg_id: int, username: str | None, first_name: str | None):
         resp = await self._client.post(
-            "/auth/register",
+            "/auth/telegram/register",
             json={"telegram_id": tg_id, "username": username, "first_name": first_name},
             headers={"X-Bot-Secret": settings.api_secret},
         )

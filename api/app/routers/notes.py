@@ -9,6 +9,7 @@ from ..db import get_db
 from ..deps import current_user, is_admin
 from ..jobs import enqueue_preview
 from ..models import Course, Faculty, Note, Professor, Purchase, Review, Status, User
+from ..normalize import doc_type
 from ..schemas import NoteCreateIn, ReviewIn
 from ..services import note_card
 from ..storage import presigned_get, put_bytes
@@ -49,6 +50,7 @@ def create_note(
         title=body.title.strip(),
         description=body.description.strip(),
         price_toman=body.price_toman,
+        kind=doc_type(body.kind),
         term=(body.term or "").strip() or None,
         tags=clean_tags(body.tags),
         file_key=key,
@@ -96,6 +98,7 @@ def list_notes(
     professor_id: int | None = None,
     tag: str | None = None,
     term: str | None = None,
+    kind: str | None = None,
     limit: int = Query(5, le=20),
     db: Session = Depends(get_db),
     user: User = Depends(current_user),
@@ -112,6 +115,7 @@ def list_notes(
             or_(
                 Note.title.ilike(like),
                 Note.description.ilike(like),
+                Note.kind.ilike(like),
                 cast(Note.tags, Text).ilike(like),
             )
         )
@@ -127,6 +131,8 @@ def list_notes(
         query = query.filter(Note.tags.contains([tag]))
     if term:
         query = query.filter(Note.term == term)
+    if kind:
+        query = query.filter(Note.kind == kind)
     items = query.order_by(Note.created_at.desc()).limit(limit).all()
     return {"items": [note_card(db, n) for n in items]}
 

@@ -22,6 +22,7 @@ def public_notes(
     professor_id: int | None = None,
     tag: str | None = None,
     term: str | None = None,
+    kind: str | None = None,
     limit: int = Query(12, le=48),
     offset: int = 0,
     db: Session = Depends(get_db),
@@ -41,6 +42,7 @@ def public_notes(
                 Note.description.ilike(like),
                 Course.name.ilike(like),
                 Professor.name.ilike(like),
+                Note.kind.ilike(like),
                 cast(Note.tags, Text).ilike(like),
             )
         )
@@ -56,6 +58,8 @@ def public_notes(
         query = query.filter(Note.tags.contains([tag]))
     if term:
         query = query.filter(Note.term == term)
+    if kind:
+        query = query.filter(Note.kind == kind)
 
     total = query.count()
     items = query.order_by(Note.created_at.desc()).offset(offset).limit(limit).all()

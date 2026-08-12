@@ -6,7 +6,8 @@ from sqlalchemy.orm import Session
 from .config import settings
 from .db import get_db, init_db
 from .models import User
-from .routers import admin, importer, miniapp, notes, public, purchases, taxonomy, wallet
+from .routers import (admin, auth, importer, miniapp, notes, public,
+                      purchases, taxonomy, wallet)
 from .schemas import RegisterIn
 from .storage import ensure_bucket
 
@@ -19,6 +20,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="NoteBazar API", lifespan=lifespan)
+app.include_router(auth.router)       # /auth/* — اکانت مستقل (ایمیل/رمز)
 app.include_router(taxonomy.router)
 app.include_router(notes.router)
 app.include_router(purchases.router)
@@ -39,12 +41,13 @@ def healthz():
     return {"ok": True}
 
 
-@app.post("/auth/register")
-def register(
+@app.post("/auth/telegram/register")
+def register_telegram(
     body: RegisterIn,
     x_bot_secret: str = Header(),
     db: Session = Depends(get_db),
 ):
+    """ثبت‌نام/به‌روزرسانی کاربر تلگرام — فقط از طرف بات صدا زده می‌شه."""
     if x_bot_secret != settings.api_secret:
         raise HTTPException(401, "invalid bot secret")
     user = db.query(User).filter(User.telegram_id == body.telegram_id).first()

@@ -270,6 +270,37 @@ a { color: var(--accent); text-decoration: none; }
 
 .desc-text { color: var(--ink2); max-width: 65ch; }
 
+/* ── حساب کاربری ──────────────────── */
+.auth-wrap { max-width: 420px; margin: 56px auto; }
+.auth-card { border-top: 3px solid var(--ink); padding-top: 24px; }
+.auth-card h1 { font-family: var(--font-display); font-size: 26px; font-weight: 700; margin: 0 0 20px; }
+.tabs { display: flex; border-bottom: 1px solid var(--ink); margin-bottom: 22px; }
+.tabs button {
+  flex: 1; background: none; border: 0; font: inherit; font-weight: 600;
+  font-size: 15px; padding: 10px; color: var(--ink2); cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.tabs button.active { color: var(--ink); border-bottom-color: var(--accent); }
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 12.5px; color: var(--ink2); margin-bottom: 4px; }
+.field input {
+  width: 100%; height: 46px; font: inherit; font-size: 15px;
+  border: 0; border-bottom: 1px solid var(--ink2); border-radius: 0;
+  background: transparent; color: var(--ink); padding: 0 2px;
+}
+.field input:focus { outline: none; border-bottom-color: var(--accent); }
+.alert {
+  display: none; padding: 10px 14px; font-size: 13.5px;
+  border: 1px solid var(--red); color: var(--red); margin-bottom: 16px;
+}
+.alert.show { display: block; }
+.hint { font-size: 13px; color: var(--ink2); margin-top: 16px; }
+
+.acct-head { border-bottom: 1px solid var(--ink); padding: 24px 0 16px; margin-bottom: 8px; }
+.acct-head h1 { font-family: var(--font-display); font-size: 26px; font-weight: 700; margin: 0 0 4px; }
+.acct-head p { margin: 0; color: var(--ink2); font-size: 14px; }
+.acct-actions { display: flex; gap: 12px; margin: 16px 0 24px; flex-wrap: wrap; }
+
 /* ── مینی‌اپ ──────────────────────── */
 .vbar {
   position: sticky; top: 0; z-index: 40;

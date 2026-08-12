@@ -31,7 +31,8 @@ class NoteCreateIn(BaseModel):
     professor_id: int
     telegram_file_id: str
     file_name: str = "file"
-    term: str | None = Field(default=None, max_length=32)  # سال/ترم — مثل «بهار ۱۴۰۴»
+    kind: str | None = Field(default=None, max_length=40)  # نوع مدرک
+    term: str | None = Field(default=None, max_length=32)  # ترم خام — مثل «4041»
     tags: list[str] = Field(default_factory=list, max_length=10)
 
 
